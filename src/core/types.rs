@@ -4,9 +4,9 @@ use std::time::Duration;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Task {
+    is_done: bool,
     pub id: u32,
     pub name: String,
-    pub is_done: bool,
     pub task_type: TaskType,
     pub tags: HashSet<String>,
 }
@@ -14,7 +14,7 @@ pub struct Task {
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 pub enum TaskType {
     Basic,
-    Counter(u8, u8),
+    Counter(i8, i8),
     Timed(#[serde(with = "humantime_serde")] Option<Duration>),
 }
 
@@ -28,13 +28,24 @@ impl Task {
             tags: tags.into_iter().collect(),
         }
     }
-    pub fn new_counter(id: u32, name: String, count: u8, tags: Vec<String>) -> Self {
+    pub fn new_counter(id: u32, name: String, count: i8, tags: Vec<String>) -> Self {
         Self {
             id,
             name,
             is_done: false,
             task_type: TaskType::Counter(0, count),
             tags: tags.into_iter().collect(),
+        }
+    }
+    pub fn is_done(&self) -> bool {
+        if self.is_done {
+            true
+        } else {
+            match &self.task_type {
+                TaskType::Basic => false,
+                TaskType::Counter(current, max) => *current >= *max,
+                TaskType::Timed(duration) => duration.is_some() && duration.unwrap().as_secs() == 0,
+            }
         }
     }
     pub fn check(&mut self) {
@@ -44,10 +55,10 @@ impl Task {
         }
         self.is_done = true;
     }
-    pub fn increment_counter(&mut self) {
+    pub fn add_to_counter(&mut self, count: i8) {
         if let TaskType::Counter(ref mut current, max) = self.task_type {
             if *current < max {
-                *current += 1;
+                *current += count;
             }
         }
     }

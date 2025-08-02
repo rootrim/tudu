@@ -6,16 +6,16 @@ fn test_task_creation() {
     let task = Task::new_basic(1, "Example Task".into(), vec![]);
     assert_eq!(task.id, 1);
     assert_eq!(task.name, "Example Task");
-    assert!(!task.is_done);
+    assert!(!task.is_done());
     assert_eq!(task.task_type, TaskType::Basic);
 }
 
 #[test]
 fn test_task_check() {
     let mut task = Task::new_basic(2, "Check Task".into(), vec![]);
-    assert!(!task.is_done);
+    assert!(!task.is_done());
     task.check();
-    assert!(task.is_done);
+    assert!(task.is_done());
 }
 
 #[test]
@@ -29,4 +29,14 @@ fn test_task_tags() {
     assert!(task.has_tag("Dio"));
     task.remove_tag("Dio".into());
     assert!(!task.has_tag("Dio"));
+}
+
+#[test]
+fn test_task_counter() {
+    let mut task = Task::new_counter(4, "Counter Task".into(), 5, vec![]);
+    assert_eq!(task.task_type, TaskType::Counter(0, 5));
+    task.add_to_counter(1);
+    assert_eq!(task.task_type, TaskType::Counter(1, 5));
+    task.add_to_counter(-1);
+    assert_eq!(task.task_type, TaskType::Counter(0, 5));
 }
