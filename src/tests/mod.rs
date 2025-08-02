@@ -23,8 +23,9 @@ fn test_task_tags() {
     assert!(task.tags.is_empty());
     task.add_tag("Dio".into());
     task.add_tag("Jotaro".into());
+    task.add_tag("Dio".into());
     assert_eq!(task.tags.len(), 2);
-    assert!(task.tags.contains(&"Dio".into()));
+    assert!(task.has_tag("Dio"));
     task.remove_tag("Dio".into());
-    assert!(!task.tags.contains(&"Dio".into()));
+    assert!(!task.has_tag("Dio"));
 }

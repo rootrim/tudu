@@ -5,13 +5,7 @@ pub mod core;
 mod tests;
 
 fn main() {
-    let task = Task {
-        id: 1,
-        name: "Example Task".to_string(),
-        is_done: false,
-        task_type: TaskType::Basic,
-        tags: vec!["example".to_string(), "task".to_string()],
-    };
+    let task = Task::new(1, "Habibi".into(), TaskType::Basic);
     println!("Goodbye, JoJo!");
     println!("Task created: {task:?}");
 }
