@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+use std::collections::HashSet;
 use std::time::Duration;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -7,7 +8,7 @@ pub struct Task {
     pub name: String,
     pub is_done: bool,
     pub task_type: TaskType,
-    pub tags: Vec<String>,
+    pub tags: HashSet<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
@@ -24,20 +25,19 @@ impl Task {
             name,
             is_done: false,
             task_type,
-            tags: Vec::new(),
+            tags: HashSet::new(),
         }
     }
     pub fn check(&mut self) {
         self.is_done = true;
     }
     pub fn add_tag(&mut self, tag: String) {
-        if !self.tags.contains(&tag) {
-            self.tags.push(tag);
-        }
+        self.tags.insert(tag);
     }
     pub fn remove_tag(&mut self, tag: String) {
-        if self.tags.contains(&tag) {
-            self.tags.retain(|t| t != &tag);
-        }
+        self.tags.remove(&tag);
+    }
+    pub fn has_tag(&self, tag: &str) -> bool {
+        self.tags.contains(tag)
     }
 }
