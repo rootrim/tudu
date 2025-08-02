@@ -1,6 +1,5 @@
 use serde::{Deserialize, Serialize};
 use std::collections::HashSet;
-use std::time::Duration;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Task {
@@ -15,7 +14,6 @@ pub struct Task {
 pub enum TaskType {
     Basic,
     Counter(i8, i8),
-    Timed(#[serde(with = "humantime_serde")] Option<Duration>),
 }
 
 impl Task {
@@ -44,7 +42,6 @@ impl Task {
             match &self.task_type {
                 TaskType::Basic => false,
                 TaskType::Counter(current, max) => *current >= *max,
-                TaskType::Timed(duration) => duration.is_some() && duration.unwrap().as_secs() == 0,
             }
         }
     }
