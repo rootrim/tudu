@@ -19,13 +19,13 @@ pub enum TaskType {
 }
 
 impl Task {
-    pub fn new(id: u32, name: String, task_type: TaskType) -> Self {
+    pub fn new_basic(id: u32, name: String, tags: Vec<String>) -> Self {
         Self {
             id,
             name,
             is_done: false,
-            task_type,
-            tags: HashSet::new(),
+            task_type: TaskType::Basic,
+            tags: tags.into_iter().collect(),
         }
     }
     pub fn check(&mut self) {
