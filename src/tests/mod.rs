@@ -39,4 +39,7 @@ fn test_task_counter() {
     assert_eq!(task.task_type, TaskType::Counter(1, 5));
     task.add_to_counter(-1);
     assert_eq!(task.task_type, TaskType::Counter(0, 5));
+    task.add_to_counter(5);
+    assert_eq!(task.task_type, TaskType::Counter(5, 5));
+    assert!(task.is_done());
 }
