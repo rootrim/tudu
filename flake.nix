@@ -1,54 +1,42 @@
 {
-  description = "tudu: a terminal application for managing tasks without ease";
+  description =
+    "Tudu: A terminal application for managing tasks with a reward mechanism.";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-25.11";
+    naersk.url = "github:nix-community/naersk";
     flake-utils.url = "github:numtide/flake-utils";
-    rust-overlay.url = "github:oxalica/rust-overlay";
   };
 
-  outputs =
-    {
-      self,
-      nixpkgs,
-      flake-utils,
-      rust-overlay,
-    }:
-    flake-utils.lib.eachDefaultSystem (
-      system:
+  outputs = { self, flake-utils, naersk, nixpkgs }:
+    flake-utils.lib.eachDefaultSystem (system:
       let
-        overlays = [ rust-overlay.overlays.default ];
-        pkgs = import nixpkgs {
-          inherit system overlays;
-        };
+        pkgs = (import nixpkgs) { inherit system; };
 
-        rustToolchain = pkgs.rust-bin.stable.latest.default;
-      in
-      {
-        packages.default = pkgs.rustPlatform.buildRustPackage {
+        naersk' = pkgs.callPackage naersk { };
+
+      in rec {
+        defaultPackage = naersk'.buildPackage {
           pname = "tudu";
           version = "0.1.0";
-
           src = ./.;
+        };
 
-          cargoLock = {
-            lockFile = ./Cargo.lock;
-          };
+        buildInputs = with pkgs; [ openssl mold ];
+        nativeBuildInputs = with pkgs; [ pkg-config ];
 
-          nativeBuildInputs = with pkgs; [ pkg-config ];
-          buildInputs = with pkgs; [
-            pkg-config
+        devShell = pkgs.mkShell {
+          nativeBuildInputs = with pkgs; [
+            rustc
+            cargo
+            clippy
+            rust-analyzer
+            rustfmt
             openssl
+            pkg-config
+            mold
           ];
         };
 
-        devShells.default = pkgs.mkShell {
-          buildInputs = [
-            rustToolchain
-            pkgs.pkg-config
-            pkgs.openssl
-          ];
-        };
-      }
-    );
+      });
 }
