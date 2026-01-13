@@ -8,7 +8,7 @@
     flake-utils.url = "github:numtide/flake-utils";
   };
 
-  outputs = { flake-utils, naersk, nixpkgs }:
+  outputs = { self, flake-utils, naersk, nixpkgs }:
     flake-utils.lib.eachDefaultSystem (system:
       let
         pkgs = (import nixpkgs) { inherit system; };
@@ -22,7 +22,7 @@
           src = ./.;
         };
 
-        buildInputs = with pkgs; [ openssl mold ];
+        buildInputs = with pkgs; [ openssl ];
         nativeBuildInputs = with pkgs; [ pkg-config ];
 
         devShell = pkgs.mkShell {
@@ -34,7 +34,6 @@
             rustfmt
             openssl
             pkg-config
-            mold
           ];
         };
 
