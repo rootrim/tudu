@@ -8,14 +8,14 @@
     flake-utils.url = "github:numtide/flake-utils";
   };
 
-  outputs = { self, flake-utils, naersk, nixpkgs }:
+  outputs = { flake-utils, naersk, nixpkgs }:
     flake-utils.lib.eachDefaultSystem (system:
       let
         pkgs = (import nixpkgs) { inherit system; };
 
         naersk' = pkgs.callPackage naersk { };
 
-      in rec {
+      in {
         defaultPackage = naersk'.buildPackage {
           pname = "tudu";
           version = "0.1.0";
