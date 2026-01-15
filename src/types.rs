@@ -24,12 +24,16 @@ impl Todo {
         self.completed = !self.completed;
     }
 
-    pub fn pretty_print(&self) -> String {
+    pub fn pretty(&self) -> String {
         format!(
             "[{}] {} (created at: {})",
             if self.completed { "x" } else { " " },
             self.title,
             self.created_at
         )
+    }
+
+    pub fn to_json(&self) -> String {
+        serde_json::to_string(self).unwrap()
     }
 }
