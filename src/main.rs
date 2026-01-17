@@ -1,3 +1,14 @@
+#[allow(dead_code)]
+mod app;
+mod types;
+mod ui;
+
+use app::App;
+
 fn main() {
-    println!("rebirth of habbab");
+    let app = App::create();
+
+    for todo in app.todos.items() {
+        println!("{}", todo.pretty());
+    }
 }
