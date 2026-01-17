@@ -71,6 +71,12 @@ impl TodoList {
             self.items.remove(selected);
         };
     }
+
+    pub fn toggle_selected(&mut self) {
+        if let Some(i) = self.state.selected() {
+            self.items[i].toggle_mark();
+        }
+    }
 }
 
 impl Default for TodoList {

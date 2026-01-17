@@ -1,4 +1,7 @@
-use ratatui::DefaultTerminal;
+use ratatui::{
+    DefaultTerminal,
+    crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind},
+};
 
 use crate::types::{Todo, TodoList};
 use std::fs;
@@ -40,6 +43,40 @@ impl App {
                     frame.render_widget(&mut self, frame.area());
                 })
                 .unwrap();
+            if let Event::Key(key) = event::read().unwrap() {
+                self.handle_key_event(key);
+            }
+        }
+        self.save_todos();
+    }
+
+    fn handle_key_event(&mut self, key: KeyEvent) {
+        if key.kind != KeyEventKind::Press {
+            return;
+        }
+        match key.code {
+            KeyCode::Char('q') => {
+                self.should_exit = true;
+            }
+            KeyCode::Char('a') => {
+                self.add_todo("New Todo");
+            }
+            KeyCode::Char('m') => {
+                self.todos.toggle_selected();
+            }
+            KeyCode::Char('d') => {
+                self.todos.remove_selected();
+            }
+            KeyCode::Char('j') => {
+                self.todos.state.select_next();
+            }
+            KeyCode::Char('k') => {
+                self.todos.state.select_previous();
+            }
+            KeyCode::Esc => {
+                self.todos.state.select(None);
+            }
+            _ => {}
         }
     }
 }
