@@ -6,9 +6,8 @@ mod ui;
 use app::App;
 
 fn main() {
+    let terminal = ratatui::init();
     let app = App::create();
-
-    for todo in app.todos.items() {
-        println!("{}", todo.pretty());
-    }
+    app.run(terminal);
+    ratatui::restore();
 }

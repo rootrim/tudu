@@ -4,15 +4,15 @@ use std::time::{SystemTime, UNIX_EPOCH};
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct TodoList {
-    items: Vec<Todo>,
-    state: ListState,
+    pub items: Vec<Todo>,
+    pub state: ListState,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Todo {
     created_at: u64,
     pub title: String,
-    todo_state: TodoState,
+    pub todo_state: TodoState,
 }
 
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
@@ -64,10 +64,6 @@ impl TodoList {
 
     pub fn push(&mut self, todo: Todo) {
         self.items.push(todo);
-    }
-
-    pub fn items(&self) -> &Vec<Todo> {
-        &self.items
     }
 
     pub fn remove_selected(&mut self) {

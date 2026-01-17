@@ -1,3 +1,5 @@
+use ratatui::DefaultTerminal;
+
 use crate::types::{Todo, TodoList};
 use std::fs;
 
@@ -29,5 +31,15 @@ impl App {
 
     pub fn add_todo(&mut self, title: &str) {
         self.todos.push(Todo::new(title));
+    }
+
+    pub fn run(mut self, mut terminal: DefaultTerminal) {
+        while !self.should_exit {
+            terminal
+                .draw(|frame| {
+                    frame.render_widget(&mut self, frame.area());
+                })
+                .unwrap();
+        }
     }
 }
