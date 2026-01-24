@@ -8,6 +8,7 @@ use std::fs;
 
 pub struct App {
     pub todos: TodoList,
+    pub is_editing: bool,
     should_exit: bool,
 }
 
@@ -15,6 +16,7 @@ impl App {
     pub fn create() -> Self {
         App {
             todos: Self::load_todos(),
+            is_editing: false,
             should_exit: false,
         }
     }
@@ -54,29 +56,55 @@ impl App {
         if key.kind != KeyEventKind::Press {
             return;
         }
-        match key.code {
-            KeyCode::Char('q') => {
-                self.should_exit = true;
+        if self.is_editing {
+            match key.code {
+                KeyCode::Enter | KeyCode::Esc => {
+                    self.is_editing = false;
+                }
+                KeyCode::Char(c) => {
+                    if let Some(current) = self.todos.selected_mut() {
+                        current.title.push(c);
+                    }
+                }
+                KeyCode::Backspace => {
+                    if let Some(current) = self.todos.selected_mut() {
+                        current.title.pop();
+                    }
+                }
+                _ => {}
             }
-            KeyCode::Char('a') => {
-                self.add_todo("New Todo");
+        } else {
+            match key.code {
+                KeyCode::Char('q') => {
+                    self.should_exit = true;
+                }
+                KeyCode::Char('r') => {
+                    if self.todos.state.selected().is_some() {
+                        self.is_editing = true;
+                    }
+                }
+                KeyCode::Char('a') => {
+                    self.todos.push(Todo::new(""));
+                    self.todos.state.select(Some(self.todos.items.len() - 1));
+                    self.is_editing = true;
+                }
+                KeyCode::Char('m') | KeyCode::Char(' ') => {
+                    self.todos.toggle_selected();
+                }
+                KeyCode::Char('d') => {
+                    self.todos.remove_selected();
+                }
+                KeyCode::Char('j') => {
+                    self.todos.state.select_next();
+                }
+                KeyCode::Char('k') => {
+                    self.todos.state.select_previous();
+                }
+                KeyCode::Esc => {
+                    self.todos.state.select(None);
+                }
+                _ => {}
             }
-            KeyCode::Char('m') => {
-                self.todos.toggle_selected();
-            }
-            KeyCode::Char('d') => {
-                self.todos.remove_selected();
-            }
-            KeyCode::Char('j') => {
-                self.todos.state.select_next();
-            }
-            KeyCode::Char('k') => {
-                self.todos.state.select_previous();
-            }
-            KeyCode::Esc => {
-                self.todos.state.select(None);
-            }
-            _ => {}
         }
     }
 }

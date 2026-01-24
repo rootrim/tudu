@@ -77,6 +77,13 @@ impl TodoList {
             self.items[i].toggle_mark();
         }
     }
+
+    pub fn selected_mut(&mut self) -> Option<&mut Todo> {
+        if let Some(i) = self.state.selected() {
+            return self.items.get_mut(i);
+        }
+        None
+    }
 }
 
 impl Default for TodoList {

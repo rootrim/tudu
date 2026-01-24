@@ -1,9 +1,9 @@
 use ratatui::{
     buffer::Buffer,
     layout::{Constraint, Layout, Rect},
-    style::Stylize,
-    text::Line,
-    widgets::{Block, Borders, List, Paragraph, StatefulWidget, Widget},
+    style::{Modifier, Style, Stylize},
+    text::{Line, Span},
+    widgets::{Block, Borders, HighlightSpacing, List, Paragraph, StatefulWidget, Widget, Wrap},
 };
 
 use crate::{app::App, types::TodoState};
@@ -26,24 +26,39 @@ impl Widget for &mut App {
             .items
             .iter()
             .map(|todo| {
-                let status = if todo.todo_state == TodoState::Completed {
-                    "[x] "
-                } else {
-                    "[ ] "
-                };
-                Line::raw(format!("{}{}", status, todo.title))
+                Line::from(vec![
+                    Span::raw(if todo.todo_state == TodoState::Completed {
+                        "[x] "
+                    } else {
+                        "[ ] "
+                    }),
+                    Span::styled(
+                        todo.title.clone(),
+                        Style::default().add_modifier(if todo.todo_state == TodoState::Completed {
+                            Modifier::CROSSED_OUT | Modifier::DIM
+                        } else {
+                            Modifier::empty()
+                        }),
+                    ),
+                ])
             })
             .collect();
 
         let list = List::new(list_items)
             .block(list_block)
             .highlight_symbol(">")
-            .highlight_spacing(ratatui::widgets::HighlightSpacing::Always);
+            .highlight_spacing(HighlightSpacing::Always);
 
         StatefulWidget::render(&list, list_area, buf, &mut self.todos.state);
 
-        Paragraph::new("Use j/k to move, ESC to unselect, m to toggle complete, d to delete selected, a to add a new todo.")
+        Paragraph::new(
+            if self.is_editing {
+                "Type the name and press Enter/ESC to save."
+            } else {
+            "Use j/k to move, ESC to unselect, m/SPACE to toggle complete, d to delete selected, a to add a new todo, r to rename selected, q to quit." } 
+            )
             .centered()
+            .wrap(Wrap { trim: true })
             .render(footer_area, buf);
 
         Paragraph::new("Absolute TUDU")
